@@ -9,10 +9,13 @@ charset-normalizer==3.4.2
 Django==5.2
 djangorestframework==3.16.0
 djangorestframework_simplejwt==5.5.0
+et_xmlfile==2.0.0
 frozenlist==1.6.0
+git-filter-repo==2.47.0
 idna==3.10
 multidict==6.4.3
 mysqlclient==2.2.7
+openpyxl==3.1.5
 propcache==0.3.1
 PyJWT==2.9.0
 python-dotenv==1.1.0
