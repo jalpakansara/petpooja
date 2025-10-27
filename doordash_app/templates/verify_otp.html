@@ -1,0 +1,205 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify OTP</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="center-content">
+  <header class="page-header">
+    <span class="logo-text">Petpooja</span>
+    <span class="logo-metrics">Food Metrics</span>
+  </header>
+
+  <div class="container-fluid content-card-container">
+    <div class="content-card forgot-password-card">
+      <h2 class="title">OTP Verification</h2>
+      <p class="description">
+        Please enter the 4-digit OTP sent to your registered phone number.
+      </p>
+
+      <form id="otp-form" method="post">
+        {% csrf_token %}
+
+        <!-- OTP input -->
+        <div class="mb-4">
+            <label for="otp" class="form-label">Enter OTP</label>
+            <input type="hidden" id="phone_number" name="phone_number">
+            <input 
+              type="text" 
+              class="form-control text-center" 
+              id="otp" 
+              name="otp" 
+              maxlength="4" 
+              placeholder="Enter 4-digit OTP" 
+              required
+              inputmode="numeric" 
+              pattern="[0-9]{4}" 
+              oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4)">
+          </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <!-- <button type="button" id="sendBtn" class="btn btn-link link-cancel">Send OTP</button> -->
+          <!-- <button type="button" id="resendBtn" class="btn btn-link link-cancel">Resend OTP</button> -->
+          <button type="submit" class="btn btn-primary primary-btn">Verify OTP</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    
+
+    // 📨 SEND OTP (first time)
+    // document.getElementById('sendBtn').addEventListener('click', function() {
+    //   fetch("{% url 'login' %}", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       "X-CSRFToken": csrfToken
+    //     },
+    //     body: JSON.stringify({})
+    //   })
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     if (data.success) {
+    //       Swal.fire({
+    //         icon: "success",
+    //         title: "OTP Sent!",
+    //         text: data.message || "Please check your phone or email for the OTP.",
+    //         confirmButtonColor: "#F9850A !important"
+    //       });
+    //     } else {
+    //       Swal.fire({
+    //         icon: "error",
+    //         title: "Failed",
+    //         text: data.message || "Could not send OTP. Please try again.",
+    //         confirmButtonColor: "#F9850A !important"
+    //       });
+    //     }
+    //   })
+    //   .catch(error => {
+    //     console.error("Error:", error);
+    //     Swal.fire({
+    //       icon: "error",
+    //       title: "Something went wrong",
+    //       text: "Please try again later."
+    //     });
+    //   });
+    // });
+
+    // 🔄 RESEND OTP
+    // document.getElementById('resendBtn').addEventListener('click', function() {
+    //   fetch("{% url 'send-otp' %}", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       "X-CSRFToken": csrfToken
+    //     },
+    //     body: JSON.stringify({})
+    //   })
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     if (data.success) {
+    //       Swal.fire({
+    //         icon: "success",
+    //         title: "OTP Resent",
+    //         text: data.message || "Please check your inbox for the new OTP.",
+    //         confirmButtonColor: "#F9850A !important"
+    //       });
+    //     } else {
+    //       Swal.fire({
+    //         icon: "error",
+    //         title: "Error",
+    //         text: data.message || "Failed to resend OTP. Please try again.",
+    //         confirmButtonColor: "#F9850A !important"
+    //       });
+    //     }
+    //   })
+    //   .catch(error => {
+    //     console.error("Error:", error);
+    //     Swal.fire({
+    //       icon: "error",
+    //       title: "Something went wrong",
+    //       text: "Please try again later."
+    //     });
+    //   });
+    // });
+
+    // ✅ VERIFY OTP
+
+  // Extract phone number from query string
+  const urlParams = new URLSearchParams(window.location.search);
+  const phoneNumber = urlParams.get('phone');
+
+  console.log("Phone Number:", phoneNumber);
+  // You can use it to prefill a hidden input or show it on the page
+  const phone_number = document.getElementById('phone_number').value = phoneNumber;
+
+    document.getElementById('otp-form').addEventListener('submit', function(event) {
+      console.log("click")
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+      const otp = document.getElementById('otp').value;
+        if (!/^\d{4}$/.test(otp)) {
+        Swal.fire({
+            icon: "error",
+            title: "Invalid OTP",
+            text: "Please enter a 4-digit numeric OTP.",
+            confirmButtonColor: "#F9850A !important"
+        });
+        // return;
+        }
+      event.preventDefault();
+      // const otp = document.getElementById('otp').value;
+
+      fetch("{% url 'verify-phone' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({ otp: otp, phone_number:phone_number })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Verified!",
+            text: data.message || "OTP verified successfully.",
+            confirmButtonColor: "#F9850A !important"
+          }).then(() => {
+            window.location.href = "{% url 'login-page' %}";
+          });
+        } else {
+          console.log("data :",data)
+          Swal.fire({
+            icon: "error",
+            title: "Invalid OTP",
+            text: data.message || "Please enter a valid OTP.",
+            confirmButtonColor: "#F9850A !important"
+          });
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong",
+          text: "Please try again later."
+        });
+      });
+    });
+  </script>
+</body>
+</html>

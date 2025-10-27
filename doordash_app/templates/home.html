@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetPooja - Food Metrics Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        body {
+            display: flex; /* Use flexbox for sidebar and main content */
+            min-height: 100vh;
+            background-color: #f8f9fa; /* Light gray background */
+        }
+        .sidebar {
+            width: 70px; /* Fixed width for the sidebar */
+            background-color: #fff;
+            border-right: 1px solid #dee2e6;
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0; /* Prevent sidebar from shrinking */
+        }
+        .sidebar-icon {
+            color: #F9850A !important; /* Gray icons */
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .sidebar-icon.active,
+        .sidebar-icon:hover {
+            color: #F9850A; /* Red for active/hover */
+            background-color: #fde6e4; /* Light red background for active/hover */
+        }
+        .main-content {
+            flex-grow: 1; /* Main content takes remaining space */
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar-brand-text {
+            font-weight: bold;
+            color: #F9850A; /* Reddish color like the 'PetPooja' logo */
+            font-size: 1.5rem;
+            margin-left: 10px;
+        }
+        .header-search-bar {
+            width: 400px; /* Adjust width as needed */
+            border-radius: 0.375rem; /* Bootstrap default border-radius */
+        }
+        .header-search-bar .form-control {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .header-search-bar .input-group-text {
+            background-color: #fff;
+            border-left: 0;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        #map {
+            height: 65vh; /* Map takes up more of the available height */
+            width: 100%;
+            border-bottom: 1px solid #dee2e6; /* Separator for map and table */
+        }
+        .table-controls {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .table-header {
+            background-color: #f1f1f1; /* Light gray for table header */
+            color: #F9850A;
+        }
+        .table-pagination {
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            border-top: 1px solid #dee2e6;
+            margin-top: -1px; /* Overlap with table border */
+        }
+        .btn-red-outline {
+            color: #F9850A;
+            border-color: #F9850A;
+        }
+        .btn-red-outline:hover {
+            background-color: #F9850A;
+            color: #fff;
+        }
+        .btn-red {
+            background-color: #F9850A;
+            border-color: #F9850A;
+            color: #fff;
+        }
+        .btn-red:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+
+        /* Map marker styling (conceptual, actual implementation uses Google Maps API) */
+        .map-marker {
+            background-color: #F9850A; /* Red background */
+            color: #fff;
+            padding: 5px 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: absolute; /* Needed if using custom div markers */
+            transform: translate(-50%, -50%); /* Center the marker */
+        }
+        .active>.page-link, .page-link.active {
+            background-color: #F9850A;
+            border-color: #F9850A
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <a href="#" class="sidebar-icon active"><i class="fas fa-home"></i></a>
+        <a href="#" class="sidebar-icon"><i class="fas fa-chart-bar"></i></a>
+        <a href="#" class="sidebar-icon"><i class="fas fa-filter"></i></a>
+        <a href="#" class="sidebar-icon"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <div class="main-content">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <span class="navbar-brand-text">PetPooja</span>
+                </a>
+                <div class="d-flex justify-content-center flex-grow-1">
+                    <div class="input-group header-search-bar">
+                        <input type="text" class="form-control" placeholder="Search for city" aria-label="Search">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-secondary me-2 btn-sm">Filter <i class="fas fa-bars ms-1"></i></button>
+                    <button class="btn btn-red btn-sm me-3">Show Info</button>
+                    <i class="fas fa-bell me-3 text-secondary" style="font-size: 1.2rem;"></i>
+                </div>
+            </div>
+        </nav>
+
+        <div id="map"></div>
+
+        <div class="table-controls bg-white">
+            <h5 class="mb-0">Businesses <span class="badge bg-secondary">120</span></h5>
+            <div>
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Edit Column
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </div>
+                <button class="btn btn-red btn-sm">Export</button>
+            </div>
+        </div>
+
+        <div class="container data-table-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h4 class="text-dark fw-bold mb-0">🍽️ Business Metrics</h4>
+              <div>
+                <button class="btn btn-outline-secondary btn-sm me-2">Edit Columns</button>
+                <button class="btn btn-danger btn-sm">Export</button>
+              </div>
+            </div>
+        
+            <div class="table-responsive">
+              <table class="table table-hover table-sm table-orange align-middle">
+                <thead>
+                  <tr>
+                    <th>Name of business</th>
+                    <th>Rating</th>
+                    <th>Restaurant Type</th>
+                    <th>No. of items</th>
+                    <th>Avg. price (1 person)</th>
+                    <th>Avg Online Orders (Monthly)</th>
+                    <th>Service Type</th>
+                  </tr>
+                </thead>
+                <tbody id="table-body">
+                  <!-- Data will be inserted here -->
+                </tbody>
+              </table>
+            </div>
+        
+            <!-- Pagination -->
+            <nav>
+              <ul class="pagination justify-content-center" id="pagination"></ul>
+            </nav>
+          </div>
+        
+          
+
+        <div class="flex-grow-1 overflow-auto bg-white"> <table class="table table-sm table-hover mb-0">
+                <thead class="table-header">
+                    <tr>
+                        <th>Name of business</th>
+                        <th>Rating</th>
+                        <th>Restaurant Type</th>
+                        <th>No. of items</th>
+                        <th>Avg. price (1 person)</th>
+                        <th>Avg Online Orders (Monthly)</th>
+                        <th>Service Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sage & Stone Fine Dining</td>
+                        <td>5.0</td>
+                        <td>Cafe</td>
+                        <td>560</td>
+                        <td>$4</td>
+                        <td>-</td>
+                        <td>Delivery, Dine In, Pick Up</td>
+                    </tr>
+                    <tr>
+                        <td>The Urban Cow Grill & Tap</td>
+                        <td>4.0</td>
+                        <td>Restro</td>
+                        <td>680</td>
+                        <td>$4.4</td>
+                        <td>345</td>
+                        <td>Delivery, Pick Up</td>
+                    </tr>
+                    <tr>
+                        <td>Lemon & Sage Mediterranean Kitchen</td>
+                        <td>2.8</td>
+                        <td>Restaurant</td>
+                        <td>1580</td>
+                        <td>$3</td>
+                        <td>1600</td>
+                        <td>Delivery, Dine In, Pick Up</td>
+                    </tr>
+                    <tr>
+                        <td>Olive & Thyme Ristorante</td>
+                        <td>3.9</td>
+                        <td>Cafe</td>
+                        <td>234</td>
+                        <td>$6</td>
+                        <td>2334</td>
+                        <td>Delivery, Dine In, Pick Up</td>
+                    </tr>
+                    <tr>
+                        <td>The Harvest Moon Bistro</td>
+                        <td>1.5</td>
+                        <td>Restro</td>
+                        <td>12</td>
+                        <td>$23</td>
+                        <td>2344</td>
+                        <td>Delivery, Pick Up</td>
+                    </tr>
+                    <tr>
+                        <td>Garden Grove Cafe & Bistro</td>
+                        <td>2.0</td>
+                        <td>Restaurant</td>
+                        <td>346</td>
+                        <td>$33</td>
+                        <td>5797</td>
+                        <td>Delivery, Dine In, Pick Up</td>
+                    </tr>
+                    <tr>
+                        <td>Copper Kettle Steakhouse</td>
+                        <td>3.2</td>
+                        <td>Restaurant</td>
+                        <td>537</td>
+                        <td>$4</td>
+                        <td>1348</td>
+                        <td>Dine-In</td>
+                    </tr>
+                    <tr>
+                        <td>Rustic Roots Tavern & Brewery</td>
+                        <td>3.4</td>
+                        <td>Cafe</td>
+                        <td>873</td>
+                        <td>$9</td>
+                        <td>3</td>
+                        <td>Delivery, Pick Up</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-pagination bg-white border-top">
+            <small class="text-muted">Showing 1 to 12 of 112 results</small>
+            <nav aria-label="Table pagination">
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                    <li class="page-item"><a class="page-link" href="#">50</a></li>
+                    <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Dummy data
+        const data = [
+          { name: "Sage & Stone Fine Dining", rating: 5.0, type: "Cafe", items: 560, price: "$4", orders: "-", service: "Delivery, Dine In" },
+          { name: "The Urban Cow Grill & Tap", rating: 4.0, type: "Restro", items: 680, price: "$4.4", orders: 345, service: "Delivery, Pickup" },
+          { name: "Curry House Delight", rating: 4.2, type: "Indian", items: 340, price: "$5", orders: 290, service: "Dine In" },
+          { name: "La Pasta Bella", rating: 4.6, type: "Italian", items: 500, price: "$6", orders: 410, service: "Delivery, Dine In" },
+          { name: "Taco Town", rating: 3.8, type: "Mexican", items: 300, price: "$3.5", orders: 280, service: "Pickup" },
+          { name: "Burger Mania", rating: 4.3, type: "Fast Food", items: 450, price: "$4.2", orders: 350, service: "Delivery" },
+          { name: "The Vegan Leaf", rating: 4.9, type: "Vegan", items: 380, price: "$5.5", orders: 410, service: "Delivery, Pickup" },
+          { name: "Sushi Paradise", rating: 4.7, type: "Japanese", items: 260, price: "$7", orders: 200, service: "Dine In" },
+          { name: "BBQ Central", rating: 4.1, type: "BBQ", items: 520, price: "$6", orders: 370, service: "Delivery, Pickup" },
+          { name: "Pizza Palace", rating: 4.5, type: "Italian", items: 410, price: "$5.2", orders: 390, service: "Delivery, Dine In" },
+          { name: "Café Aroma", rating: 4.8, type: "Cafe", items: 280, price: "$3", orders: 270, service: "Dine In" },
+          { name: "The Green Bowl", rating: 4.4, type: "Healthy", items: 230, price: "$5.8", orders: 320, service: "Delivery" }
+        ];
+    
+        const rowsPerPage = 5;
+        let currentPage = 1;
+    
+        function displayTable(page) {
+          const start = (page - 1) * rowsPerPage;
+          const end = start + rowsPerPage;
+          const pageData = data.slice(start, end);
+    
+          const tableBody = document.getElementById("table-body");
+          tableBody.innerHTML = "";
+    
+          pageData.forEach(row => {
+            const tr = `
+              <tr>
+                <td>${row.name}</td>
+                <td>${row.rating}</td>
+                <td>${row.type}</td>
+                <td>${row.items}</td>
+                <td>${row.price}</td>
+                <td>${row.orders}</td>
+                <td>${row.service}</td>
+              </tr>
+            `;
+            tableBody.innerHTML += tr;
+          });
+    
+          setupPagination();
+        }
+    
+        function setupPagination() {
+          const pageCount = Math.ceil(data.length / rowsPerPage);
+          const pagination = document.getElementById("pagination");
+          pagination.innerHTML = "";
+    
+          for (let i = 1; i <= pageCount; i++) {
+            const li = document.createElement("li");
+            li.className = `page-item ${i === currentPage ? "active" : ""}`;
+            li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+            li.addEventListener("click", () => {
+              currentPage = i;
+              displayTable(currentPage);
+            });
+            pagination.appendChild(li);
+          }
+        }
+    
+        // Initialize
+        displayTable(currentPage);
+      </script>
+    
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function initMap() {
+            const mapOptions = {
+                center: { lat: 39.8283, lng: -98.5795 }, // Center of the US
+                zoom: 4,
+                disableDefaultUI: true, // Hide default map controls
+                zoomControl: true, // Re-enable zoom control as it's visible in image 3
+                zoomControlOptions: {
+                    position: google.maps.ControlPosition.RIGHT_BOTTOM // Position zoom controls
+                }
+            };
+            const map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+            // Placeholder for adding markers from your data
+            // To create the red markers with white text:
+            const citiesData = [
+                { lat: 39.5296, lng: -119.8138, label: "22", city: "Reno" },
+                { lat: 36.1699, lng: -115.1398, label: "22", city: "Las Vegas" },
+                { lat: 40.7608, lng: -111.8910, label: "33", city: "Salt Lake City" },
+                { lat: 34.0522, lng: -118.2437, label: "34", city: "Los Angeles" },
+                { lat: 41.8781, lng: -87.6298, label: "2.5K", city: "Chicago" },
+                { lat: 40.7128, lng: -74.0060, label: "1.5K", city: "New York" },
+                // ... add more cities from your data ...
+            ];
+
+            citiesData.forEach(city => {
+                const marker = new google.maps.Marker({
+                    position: { lat: city.lat, lng: city.lng },
+                    map: map,
+                    icon: {
+                        url: 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="30" viewBox="0 0 50 30"><rect x="0" y="0" width="50" height="30" rx="5" ry="5" fill="%23F9850A"/><text x="25" y="20" font-family="Arial" font-size="14" fill="%23FFFFFF" text-anchor="middle">'+city.label+'</text></svg>',
+                        scaledSize: new google.maps.Size(50, 30), // Size of the SVG icon
+                        labelOrigin: new google.maps.Point(25, 20) // Center label within the SVG rect
+                    },
+                    label: {
+                        text: city.label,
+                        color: "white",
+                        fontSize: "12px",
+                        fontWeight: "bold"
+                    }
+                });
+            });
+        }
+    </script>
+    
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
+
+</body>
+</html>

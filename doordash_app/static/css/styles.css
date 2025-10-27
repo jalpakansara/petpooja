@@ -1,0 +1,330 @@
+/* Base Styles */
+body {
+    font-family: 'Poppins', sans-serif; /* Using Poppins for a modern look */
+    background-color: #f7f7f7; /* Light background similar to the image */
+    margin: 0;
+    padding: 0;
+}
+
+.login-container {
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* --- Header/Logo Styling --- */
+header {
+    margin-bottom: 2rem;
+    padding-left: 20px;
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #F9850A !important; /* Orange/Red color from the image */
+    margin-right: 5px;
+}
+
+.logo-metrics {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #444; /* Darker grey for the second part */
+}
+
+/* --- Left Section (Welcome) --- */
+.welcome-section {
+    padding-right: 4rem; /* Spacing */
+    text-align: left;
+}
+
+.welcome-heading {
+    font-size: 3rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-text {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 3rem;
+}
+
+.illustration-container {
+    max-width: 80%; /* Control illustration size */
+    margin-top: 2rem;
+}
+
+.login-illustration {
+    /* Set a placeholder size for the image/illustration */
+    height: auto;
+}
+
+/* --- Right Section (Login Form) --- */
+.login-form-col {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+    max-width: 400px; /* Max width for the login form box */
+    width: 100%;
+}
+
+.login-heading {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.login-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+/* --- Form Elements Styling --- */
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 0.3rem;
+}
+
+.form-control {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+}
+
+.input-group-text {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-left: none;
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+}
+
+.forgot-password-link {
+    font-size: 0.85rem;
+    color: #F9850A !important; /* Accent color */
+    text-decoration: none;
+    font-weight: 400;
+}
+
+.remember-me-label {
+    font-weight: 400;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* --- Button Styling --- */
+.login-btn {
+    background-color: #F9850A !important; /* Accent color */
+    border-color: #F9850A !important;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.login-btn:hover {
+    background-color: #C66907 !important; /* Slightly darker on hover */
+    border-color: #C66907 !important;
+}
+
+/* --- Footer Links --- */
+.sign-up-text {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.sign-up-link {
+    color: #F9850A !important;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* --- The requested Error Message Styling --- */
+.error-message {
+    color: #dc3545; /* Bootstrap's red color */
+    background-color: #f8d7da; /* Light red background */
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 0.9rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* --- Media Queries for Responsiveness (Mobile View Adjustments) --- */
+@media (max-width: 991px) {
+    .login-container {
+        padding: 10px;
+    }
+    
+    .login-form-col {
+        padding: 0;
+    }
+
+    .login-card {
+        padding: 20px !important;
+        box-shadow: none; /* Remove shadow on mobile for a full-screen feel */
+        max-width: 100%;
+    }
+
+    header {
+        text-align: center;
+        padding-left: 0;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-heading {
+        font-size: 2rem; /* Smaller heading on mobile */
+    }
+}
+
+
+/* Base Styles */
+body {
+    font-family: Arial, sans-serif; /* Use your preferred font */
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
+}
+
+/* Center all content vertically and horizontally */
+.center-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.page-header {
+    padding: 20px 40px;
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ce5a3d; /* Accent Color: Orange/Red */
+    margin-right: 5px;
+}
+
+.logo-metrics {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #444;
+}
+
+.content-card-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.content-card {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    padding: 40px;
+    max-width: 450px;
+    width: 100%;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.description {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+/* Form Elements */
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 0.3rem;
+}
+
+.form-control {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+}
+
+/* Primary Button (Orange/Red) */
+.primary-btn {
+    background-color: #F9850A;
+    border-color: #F9850A;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.primary-btn:hover {
+    background-color: #C66907;
+    border-color: #C66907;
+}
+
+/* Link Buttons (Cancel, Back) */
+.link-cancel, .link-back {
+    color: #F9850A;
+    text-decoration: none;
+    font-weight: 600;
+    padding-left: 0;
+}
+
+.link-cancel:hover, .link-back:hover {
+    color: #C66907;
+}
+
+/* Email Sent Page Specific */
+.sent-message {
+    line-height: 1.6;
+}
+
+.resend-link {
+    color: #ce5a3d;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* Error Message (Red Font) */
+.error-message {
+    color: #dc3545; /* Bootstrap's red color */
+    background-color: #f8d7da; /* Light red background */
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 0.9rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 15px 20px;
+        text-align: center;
+    }
+    .content-card {
+        padding: 30px 20px;
+        box-shadow: none; /* Remove shadow on mobile */
+    }
+}
