@@ -121,6 +121,32 @@
             background-color: #F9850A;
             border-color: #F9850A
         }
+        .bg-primary{
+            --bs-bg-opacity: 1;
+            background-color: #F9850A !important;
+        }
+        .btn:hover {
+            background-color: #F9850A;
+            border-color: #F9850A;
+        }
+        .btn-outline-primary {
+            border-color: #F9850A;
+            color: #fff;
+            background-color: #F9850A;
+        }
+        .btn-red-outline {
+            color: #F9850A;
+            border-color: #F9850A;
+            background-color: transparent;
+        }
+        .btn-red-outline:hover,
+        .btn-red-outline:focus,
+        .btn-red-outline:active {
+            color: #F9850A;      /* Keep text same */
+            border-color: #F9850A;
+            background-color: transparent; /* No background change */
+            box-shadow: none;    /* Remove Bootstrap focus shadow */
+        }
     </style>
 </head>
 <body>
@@ -155,10 +181,14 @@
         <div id="map"></div>
 
         <div class="table-controls bg-white">
-            <h5 class="mb-0">Businesses <span class="badge bg-secondary">120</span></h5>
+            <h5 class="mb-0">Businesses 
+                <span class="badge bg-primary">
+                    Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }}
+                </span>
+            </h5>
             <div>
                 <div class="btn-group me-2">
-                    <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button type="button" class="btn btn-red-outline btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                         Edit Column
                     </button>
                     <ul class="dropdown-menu">
@@ -167,18 +197,11 @@
                         <li><a class="dropdown-item" href="#">Something else here</a></li>
                     </ul>
                 </div>
-                <button class="btn btn-red btn-sm">Export</button>
+                <button id="exportBtn" class="btn btn-red-outline btn-sm">Export</button>
             </div>
         </div>
 
         <div class="container data-table-container">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h4 class="text-dark fw-bold mb-0">🍽️ Business Metrics</h4>
-              <div>
-                <button class="btn btn-outline-secondary btn-sm me-2">Edit Columns</button>
-                <button class="btn btn-danger btn-sm">Export</button>
-              </div>
-            </div>
         
             <div class="table-responsive">
               <table class="table table-hover table-sm table-orange align-middle">
@@ -194,193 +217,154 @@
                   </tr>
                 </thead>
                 <tbody id="table-body">
+                    {% for b in page_obj %}
                   <!-- Data will be inserted here -->
+                  <tr>
+                    <td>{{ b.restaurant_name }}</td>
+                    <td>{{ b.star_rating }}</td>
+                    <td>{{ b.category }}</td>
+                    <td>{{ b.num_items }}</td>
+                    <td>${{ b.avg_price|floatformat:2 }}</td>
+                    <td>{{ b.reviews_count }}</td>
+                    <td>{{ b.service_type }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="7">No data available</td>
+                  </tr>
+                  {% endfor %}
                 </tbody>
               </table>
             </div>
         
             <!-- Pagination -->
-            <nav>
+            <!-- <nav>
               <ul class="pagination justify-content-center" id="pagination"></ul>
-            </nav>
+            </nav> -->
+
+            <div class="table-pagination bg-white border-top mt-3">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center pagination-sm">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&laquo;</span>
+                            </li>
+                        {% endif %}
+            
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+            
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&raquo;</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
           </div>
-        
-          
-
-        <div class="flex-grow-1 overflow-auto bg-white"> <table class="table table-sm table-hover mb-0">
-                <thead class="table-header">
-                    <tr>
-                        <th>Name of business</th>
-                        <th>Rating</th>
-                        <th>Restaurant Type</th>
-                        <th>No. of items</th>
-                        <th>Avg. price (1 person)</th>
-                        <th>Avg Online Orders (Monthly)</th>
-                        <th>Service Type</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Sage & Stone Fine Dining</td>
-                        <td>5.0</td>
-                        <td>Cafe</td>
-                        <td>560</td>
-                        <td>$4</td>
-                        <td>-</td>
-                        <td>Delivery, Dine In, Pick Up</td>
-                    </tr>
-                    <tr>
-                        <td>The Urban Cow Grill & Tap</td>
-                        <td>4.0</td>
-                        <td>Restro</td>
-                        <td>680</td>
-                        <td>$4.4</td>
-                        <td>345</td>
-                        <td>Delivery, Pick Up</td>
-                    </tr>
-                    <tr>
-                        <td>Lemon & Sage Mediterranean Kitchen</td>
-                        <td>2.8</td>
-                        <td>Restaurant</td>
-                        <td>1580</td>
-                        <td>$3</td>
-                        <td>1600</td>
-                        <td>Delivery, Dine In, Pick Up</td>
-                    </tr>
-                    <tr>
-                        <td>Olive & Thyme Ristorante</td>
-                        <td>3.9</td>
-                        <td>Cafe</td>
-                        <td>234</td>
-                        <td>$6</td>
-                        <td>2334</td>
-                        <td>Delivery, Dine In, Pick Up</td>
-                    </tr>
-                    <tr>
-                        <td>The Harvest Moon Bistro</td>
-                        <td>1.5</td>
-                        <td>Restro</td>
-                        <td>12</td>
-                        <td>$23</td>
-                        <td>2344</td>
-                        <td>Delivery, Pick Up</td>
-                    </tr>
-                    <tr>
-                        <td>Garden Grove Cafe & Bistro</td>
-                        <td>2.0</td>
-                        <td>Restaurant</td>
-                        <td>346</td>
-                        <td>$33</td>
-                        <td>5797</td>
-                        <td>Delivery, Dine In, Pick Up</td>
-                    </tr>
-                    <tr>
-                        <td>Copper Kettle Steakhouse</td>
-                        <td>3.2</td>
-                        <td>Restaurant</td>
-                        <td>537</td>
-                        <td>$4</td>
-                        <td>1348</td>
-                        <td>Dine-In</td>
-                    </tr>
-                    <tr>
-                        <td>Rustic Roots Tavern & Brewery</td>
-                        <td>3.4</td>
-                        <td>Cafe</td>
-                        <td>873</td>
-                        <td>$9</td>
-                        <td>3</td>
-                        <td>Delivery, Pick Up</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="table-pagination bg-white border-top">
-            <small class="text-muted">Showing 1 to 12 of 112 results</small>
-            <nav aria-label="Table pagination">
-                <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                    <li class="page-item"><a class="page-link" href="#">5</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
-                    <li class="page-item"><a class="page-link" href="#">50</a></li>
-                    <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
-                </ul>
-            </nav>
-        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const exportBtn = document.getElementById("exportBtn");
+            exportBtn.addEventListener("click", function() {
+                // Get table
+                const table = document.querySelector("table");
+                const wb = XLSX.utils.table_to_book(table, { sheet: "Businesses" });
+        
+                // Export Excel file
+                XLSX.writeFile(wb, "business_metrics.xlsx");
+            });
+        });
+        </script>
+
     <script>
         // Dummy data
-        const data = [
-          { name: "Sage & Stone Fine Dining", rating: 5.0, type: "Cafe", items: 560, price: "$4", orders: "-", service: "Delivery, Dine In" },
-          { name: "The Urban Cow Grill & Tap", rating: 4.0, type: "Restro", items: 680, price: "$4.4", orders: 345, service: "Delivery, Pickup" },
-          { name: "Curry House Delight", rating: 4.2, type: "Indian", items: 340, price: "$5", orders: 290, service: "Dine In" },
-          { name: "La Pasta Bella", rating: 4.6, type: "Italian", items: 500, price: "$6", orders: 410, service: "Delivery, Dine In" },
-          { name: "Taco Town", rating: 3.8, type: "Mexican", items: 300, price: "$3.5", orders: 280, service: "Pickup" },
-          { name: "Burger Mania", rating: 4.3, type: "Fast Food", items: 450, price: "$4.2", orders: 350, service: "Delivery" },
-          { name: "The Vegan Leaf", rating: 4.9, type: "Vegan", items: 380, price: "$5.5", orders: 410, service: "Delivery, Pickup" },
-          { name: "Sushi Paradise", rating: 4.7, type: "Japanese", items: 260, price: "$7", orders: 200, service: "Dine In" },
-          { name: "BBQ Central", rating: 4.1, type: "BBQ", items: 520, price: "$6", orders: 370, service: "Delivery, Pickup" },
-          { name: "Pizza Palace", rating: 4.5, type: "Italian", items: 410, price: "$5.2", orders: 390, service: "Delivery, Dine In" },
-          { name: "Café Aroma", rating: 4.8, type: "Cafe", items: 280, price: "$3", orders: 270, service: "Dine In" },
-          { name: "The Green Bowl", rating: 4.4, type: "Healthy", items: 230, price: "$5.8", orders: 320, service: "Delivery" }
-        ];
+        // const data = [
+        //   { name: "Sage & Stone Fine Dining", rating: 5.0, type: "Cafe", items: 560, price: "$4", orders: "-", service: "Delivery, Dine In" },
+        //   { name: "The Urban Cow Grill & Tap", rating: 4.0, type: "Restro", items: 680, price: "$4.4", orders: 345, service: "Delivery, Pickup" },
+        //   { name: "Curry House Delight", rating: 4.2, type: "Indian", items: 340, price: "$5", orders: 290, service: "Dine In" },
+        //   { name: "La Pasta Bella", rating: 4.6, type: "Italian", items: 500, price: "$6", orders: 410, service: "Delivery, Dine In" },
+        //   { name: "Taco Town", rating: 3.8, type: "Mexican", items: 300, price: "$3.5", orders: 280, service: "Pickup" },
+        //   { name: "Burger Mania", rating: 4.3, type: "Fast Food", items: 450, price: "$4.2", orders: 350, service: "Delivery" },
+        //   { name: "The Vegan Leaf", rating: 4.9, type: "Vegan", items: 380, price: "$5.5", orders: 410, service: "Delivery, Pickup" },
+        //   { name: "Sushi Paradise", rating: 4.7, type: "Japanese", items: 260, price: "$7", orders: 200, service: "Dine In" },
+        //   { name: "BBQ Central", rating: 4.1, type: "BBQ", items: 520, price: "$6", orders: 370, service: "Delivery, Pickup" },
+        //   { name: "Pizza Palace", rating: 4.5, type: "Italian", items: 410, price: "$5.2", orders: 390, service: "Delivery, Dine In" },
+        //   { name: "Café Aroma", rating: 4.8, type: "Cafe", items: 280, price: "$3", orders: 270, service: "Dine In" },
+        //   { name: "The Green Bowl", rating: 4.4, type: "Healthy", items: 230, price: "$5.8", orders: 320, service: "Delivery" }
+        // ];
     
         const rowsPerPage = 5;
         let currentPage = 1;
     
-        function displayTable(page) {
-          const start = (page - 1) * rowsPerPage;
-          const end = start + rowsPerPage;
-          const pageData = data.slice(start, end);
+        // function displayTable(page) {
+        //   const start = (page - 1) * rowsPerPage;
+        //   const end = start + rowsPerPage;
+        //   const pageData = data.slice(start, end);
     
-          const tableBody = document.getElementById("table-body");
-          tableBody.innerHTML = "";
+        //   const tableBody = document.getElementById("table-body");
+        //   tableBody.innerHTML = "";
     
-          pageData.forEach(row => {
-            const tr = `
-              <tr>
-                <td>${row.name}</td>
-                <td>${row.rating}</td>
-                <td>${row.type}</td>
-                <td>${row.items}</td>
-                <td>${row.price}</td>
-                <td>${row.orders}</td>
-                <td>${row.service}</td>
-              </tr>
-            `;
-            tableBody.innerHTML += tr;
-          });
+        //   pageData.forEach(row => {
+        //     const tr = `
+        //       <tr>
+        //         <td>${row.name}</td>
+        //         <td>${row.rating}</td>
+        //         <td>${row.type}</td>
+        //         <td>${row.items}</td>
+        //         <td>${row.price}</td>
+        //         <td>${row.orders}</td>
+        //         <td>${row.service}</td>
+        //       </tr>
+        //     `;
+        //     // tableBody.innerHTML += tr;
+        //   });
     
-          setupPagination();
-        }
+        //   setupPagination();
+        // }
     
-        function setupPagination() {
-          const pageCount = Math.ceil(data.length / rowsPerPage);
-          const pagination = document.getElementById("pagination");
-          pagination.innerHTML = "";
+        // function setupPagination() {
+        //   const pageCount = Math.ceil(data.length / rowsPerPage);
+        //   const pagination = document.getElementById("pagination");
+        //   pagination.innerHTML = "";
     
-          for (let i = 1; i <= pageCount; i++) {
-            const li = document.createElement("li");
-            li.className = `page-item ${i === currentPage ? "active" : ""}`;
-            li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-            li.addEventListener("click", () => {
-              currentPage = i;
-              displayTable(currentPage);
-            });
-            pagination.appendChild(li);
-          }
-        }
+        //   for (let i = 1; i <= pageCount; i++) {
+        //     const li = document.createElement("li");
+        //     li.className = `page-item ${i === currentPage ? "active" : ""}`;
+        //     li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        //     li.addEventListener("click", () => {
+        //       currentPage = i;
+        //       displayTable(currentPage);
+        //     });
+        //     pagination.appendChild(li);
+        //   }
+        // }
     
         // Initialize
-        displayTable(currentPage);
+        // displayTable(currentPage);
       </script>
     
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
