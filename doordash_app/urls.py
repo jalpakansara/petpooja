@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import login_page,forgot_password,signup,verify_otp_page,otp_send,home_page,SignupView, LoginView, LogoutView, ForgotPasswordView, ResetPasswordView, HomeAPIView,RestaurantDetailAPIView,ExportRestaurantDataAPIView, FilteredRestaurantAPIView, VerifyPhoneView
+from .views import login_page,forgot_password,signup,verify_otp_page,otp_send,home_page,report_page,funnel_page,SignupView, LoginView, LogoutView, ForgotPasswordView, ResetPasswordView, HomeAPIView,RestaurantDetailAPIView,ExportRestaurantDataAPIView, FilteredRestaurantAPIView, VerifyPhoneView
 
 urlpatterns = [
     path('', login_page, name='login-page'),
@@ -7,6 +7,8 @@ urlpatterns = [
     path('signup', signup, name='signup-page'),
     path('verify/otp', verify_otp_page, name='verify-otp'),
     path('home/', home_page, name='home-page'),
+    path('reports/', report_page, name='report-page'),
+    path('funnel/', funnel_page, name='funnel-page'),
 
     path('api/signup/', SignupView.as_view(), name='signup'),
     path('api/otp_send/', otp_send, name='send-otp'),

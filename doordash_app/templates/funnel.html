@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetPooja - Food Metrics Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        body {
+            display: flex; /* Use flexbox for sidebar and main content */
+            min-height: 100vh;
+            background-color: #f8f9fa; /* Light gray background */
+        }
+        .sidebar {
+            width: 70px; /* Fixed width for the sidebar */
+            background-color: #fff;
+            border-right: 1px solid #dee2e6;
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0; /* Prevent sidebar from shrinking */
+        }
+        .sidebar-icon {
+            color: #F9850A !important; /* Gray icons */
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .sidebar-icon.active,
+        .sidebar-icon:hover {
+            color: #F9850A; /* Red for active/hover */
+            background-color: #fde6e4; /* Light red background for active/hover */
+        }
+        .main-content {
+            flex-grow: 1; /* Main content takes remaining space */
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar-brand-text {
+            font-weight: bold;
+            color: #F9850A; /* Reddish color like the 'PetPooja' logo */
+            font-size: 1.5rem;
+            margin-left: 10px;
+        }
+        .header-search-bar {
+            width: 400px; /* Adjust width as needed */
+            border-radius: 0.375rem; /* Bootstrap default border-radius */
+        }
+        .header-search-bar .form-control {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .header-search-bar .input-group-text {
+            background-color: #fff;
+            border-left: 0;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        #map {
+            height: 65vh; /* Map takes up more of the available height */
+            width: 100%;
+            border-bottom: 1px solid #dee2e6; /* Separator for map and table */
+        }
+        .table-controls {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .table-header {
+            background-color: #f1f1f1; /* Light gray for table header */
+            color: #F9850A;
+        }
+        .table-pagination {
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            border-top: 1px solid #dee2e6;
+            margin-top: -1px; /* Overlap with table border */
+        }
+        .btn-red-outline {
+            color: #F9850A;
+            border-color: #F9850A;
+        }
+        .btn-red-outline:hover {
+            background-color: #F9850A;
+            color: #fff;
+        }
+        .btn-red {
+            background-color: #F9850A;
+            border-color: #F9850A;
+            color: #fff;
+        }
+        .btn-red:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+
+        .btn-outline-primary {
+      border-color: #F9850A;
+      color: #F9850A;
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-outline-primary:hover {
+      background-color: #F9850A;
+      color: #fff;
+    }
+
+    /* ✅ When Export button is clicked (active/focused), make it orange */
+    .btn-outline-primary:active,
+    .btn-outline-primary:focus {
+      background-color: #F9850A !important;
+      border-color: #F9850A !important;
+      color: #fff !important;
+      box-shadow: none !important;
+    }
+    .btn:hover {
+      background-color: #F9850A !important;
+      border-color: #F9850A !important;
+      color: #fff !important;
+      box-shadow: none !important;
+    }
+
+        /* Map marker styling (conceptual, actual implementation uses Google Maps API) */
+        .map-marker {
+            background-color: #F9850A; /* Red background */
+            color: #fff;
+            padding: 5px 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: absolute; /* Needed if using custom div markers */
+            transform: translate(-50%, -50%); /* Center the marker */
+        }
+        .active>.page-link, .page-link.active {
+            background-color: #F9850A;
+            border-color: #F9850A
+        }
+        .bg-primary{
+            --bs-bg-opacity: 1;
+            background-color: #F9850A !important;
+        }
+       
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <a href="/home" class="sidebar-icon "><i class="fas fa-home"></i></a>
+        <a href="/reports" class="sidebar-icon"><i class="fas fa-chart-bar"></i></a>
+        <a href="/funnel" class="sidebar-icon active"><i class="fas fa-filter"></i></a>
+        <a href="#" class="sidebar-icon"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <div class="main-content p-4">
+
+        <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+        <div class="container-fluid">
+          <a class="navbar-brand d-flex align-items-center" href="#">
+            <span class="navbar-brand-text">PetPooja</span>
+          </a>
+  
+          <i class="fas fa-bell ms-auto me-3 fs-5" style="font-size: 1.2rem;"></i>
+        </div>
+      </nav>
+
+        <!-- Header Section -->
+    <div class="d-flex align-items-center mb-4 flex-wrap justify-content-between bg-white p-3 rounded shadow-sm mt-3">
+      <h2 class="h5 mb-0">Reports</h2>
+
+      <!-- ✅ Search bar + Filter + Export on right side -->
+      <div class="d-flex align-items-center">
+        <div class="input-group me-0">
+          <span class="input-group-text bg-white border-end-0">
+            <i class="fas fa-search"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control border-start-0"
+            placeholder="Search location..."
+            value="368 W 23rd ST, New York, NY 10011"
+            aria-label="Location Search"
+          />
+        </div>
+        <button class="btn btn-outline-primary ms-3" type="button">
+          Export
+        </button>
+      </div>
+    </div>
+
+        <!-- Filter Section -->
+    <div class="row align-items-end mb-4 bg-white p-3 rounded shadow-sm">
+        <div class="col-md-3">
+          <label class="form-label">Filter 1</label>
+          <select class="form-select" id="filter1">
+            <option selected>Select Star Rating</option>
+            {% for rating in star_ratings %}
+              <option value="{{ rating }}">{{ rating }}</option>
+            {% empty %}
+              <option disabled>No ratings found</option>
+            {% endfor %}
+          </select>
+        </div>
+  
+        <div class="col-md-3">
+          <label class="form-label ">Filter 2</label>
+          <select class="form-select" id="filter2">
+            <option selected>Select Cuisine</option>
+            {% for cuisine in cuisines %}
+              <option value="{{ cuisine }}">{{ cuisine }}</option>
+            {% empty %}
+              <option disabled>No cuisines found</option>
+            {% endfor %}
+          </select>
+        </div>
+  
+        <div class="col-md-3">
+          <label class="form-label ">Filter 3</label>
+          <select class="form-select" id="filter3">
+            <option selected>Select Restaurant Type</option>
+            {% for type in restaurant_types %}
+              <option value="{{ type }}">{{ type }}</option>
+            {% empty %}
+              <option disabled>No restaurant types found</option>
+            {% endfor %}
+          </select>
+        </div>
+  
+        <div class="col-md-3 d-flex justify-content-end">
+            <button class="btn btn-outline-primary ms-3" id="applyBtn" type="button">
+                Apply
+              </button>
+          <!-- <button class="btn btn-sm btn-danger text-white px-4" style="height: 38px;">Apply</button> -->
+        </div>
+      </div>
+
+    <!-- Funnel Chart Section -->
+    <h3 class="h6 fw-bold mb-3">Funnel Chart</h3>
+    <div class="bg-white p-5 border rounded-2 shadow-sm d-flex flex-column justify-content-center align-items-center" id="chartContent" style="height: 500px;">
+        <!-- Initial content (No filter applied) -->
+        <div id="initialState" class="text-center">
+            <div style="font-size: 3rem; color: #ff9900;">
+                <i class="fas fa-chart-bar"></i> 
+            </div>
+            <h4 class="mt-3 text-secondary">It's All Quite Here</h4>
+            <p class="text-muted" style="max-width: 300px;">
+                Apply all three filters to see detailed funnel chart
+            </p>
+        </div>
+        
+        <!-- Results will be injected here -->
+        <div id="resultsState" class="text-center d-none">
+            <div id="chartContainer" style="width: 100%; height: 300px;"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Interactive JavaScript -->
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+document.getElementById('applyBtn').addEventListener('click', applyFilters);
+
+function applyFilters(event) {
+    const filter1 = document.getElementById('filter1').value;
+    const filter2 = document.getElementById('filter2').value;
+    const filter3 = document.getElementById('filter3').value;
+
+    const defaultValues = ["Select Star Rating", "Select Cuisine", "Select Restaurant Type"];
+    if (filter1 === defaultValues[0] && filter2 === defaultValues[1] && filter3 === defaultValues[2]) {
+        alert("Please select at least one filter before applying!");
+        return false;
+    }
+
+    const selectedFilters = [];
+    const filterNames = ['Star Rating', 'Cuisine', 'Restaurant Type'];
+    const filterValues = [filter1, filter2, filter3];
+
+    filterValues.forEach((value, index) => {
+        if (value !== defaultValues[index]) {
+            selectedFilters.push({ label: `${filterNames[index]}: ${value}`, value: Math.floor(Math.random() * 10000) + 1000, displayValue: "..." }); // dummy values for chart
+        }
+    });
+
+    const count = selectedFilters.length;
+
+    const initialState = document.getElementById('initialState');
+    const resultsState = document.getElementById('resultsState');
+
+    if (count === 0) {
+        initialState.classList.remove('d-none');
+        resultsState.classList.add('d-none');
+    } else {
+        initialState.classList.add('d-none');
+        resultsState.classList.remove('d-none');
+
+        // Show summary
+        // let summaryHtml = selectedFilters.map(f => `<strong>${f.label}</strong>`).join('<br>');
+        // filterSummary.innerHTML = `<strong>${count} filter(s) selected:</strong><br>` + summaryHtml;
+
+        // Render chart inside resultsState
+        renderFunnelChart(selectedFilters);
+    }
+}
+
+function renderFunnelChart(funnelData) {
+    // Clear previous chart
+    d3.select("#chartContainer").selectAll("*").remove();
+
+    const width = 600;
+    const height = 300;
+    const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    const segmentHeight = innerHeight / funnelData.length;
+
+    const svg = d3.select("#chartContainer")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    const maxValue = d3.max(funnelData, d => d.value);
+    const widthScale = d3.scaleLinear().domain([0, maxValue]).range([0, innerWidth]);
+
+    // Map filter labels to colors
+    const colorMap = {
+        "Star Rating": "#f7b78a",
+        "Cuisine": "#e48a52",
+        "Restaurant Type": "#c16b32"
+    };
+
+    funnelData.forEach((d, i) => {
+        const y1 = i * segmentHeight;
+        const y2 = (i + 1) * segmentHeight;
+        const w_start = i === 0 ? widthScale(maxValue) : widthScale(funnelData[i - 1].value);
+        const w_end = widthScale(d.value);
+        const x1 = innerWidth / 2 - w_start / 2;
+        const x2 = innerWidth / 2 + w_start / 2;
+        const x3 = innerWidth / 2 + w_end / 2;
+        const x4 = innerWidth / 2 - w_end / 2;
+
+        // Get the filter type from the label (split at ':')
+        const filterType = d.label.split(':')[0].trim();
+        const fillColor = colorMap[filterType] || "#F9850A"; // default orange if not matched
+
+        svg.append("path")
+            .attr("d", `M${x1},${y1} L${x2},${y1} L${x3},${y2} L${x4},${y2} Z`)
+            .attr("fill", fillColor);
+        
+        svg.append("text")
+            .attr("x", innerWidth / 2)
+            .attr("y", y1 + segmentHeight / 2)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .attr("fill", "#fff")
+            .text(d.label);
+    });
+}
+
+</script>
+    
+</body>
+</html>

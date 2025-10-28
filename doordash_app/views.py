@@ -14,7 +14,11 @@ from rest_framework import generics, status
 from twilio.rest import Client
 from django.conf import settings
 from django.shortcuts import render
-
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Count, Avg, F, FloatField, Value
+from django.db.models.functions import Cast, Replace
+import openpyxl
 
 # Temporary in-memory storage for OTPs
 otp_storage = {}
@@ -34,8 +38,42 @@ def signup(request):
 def verify_otp_page(request):
     return render(request, 'verify_otp.html')
 
+# @login_required(login_url=settings.LOGIN_URL) 
 def home_page(request):
-    return render(request, 'home.html')
+    # Fetch all businesses from DB
+    # business_list = Doordash.objects.all().order_by('restaurant_name')
+
+    # business_list = Doordash.objects.values(
+    #     'restaurant_name','star_rating', 'category'
+    # ).annotate(num_items=Count('item_name')).order_by('restaurant_name')
+
+    # Convert item_price to numeric by removing '$' and casting to float
+    business_list = (
+       Doordash.objects
+        .annotate(
+            price_numeric=Cast(
+                Replace(F('item_price'), Value('$'), Value('')),  # remove $ sign
+                FloatField()
+            )
+        )
+        .values(
+            'restaurant_name','star_rating', 'category', 'reviews_count'
+        )
+        .annotate(
+            num_items=Count('item_name'),
+            avg_price=Avg('price_numeric')
+        )
+        .order_by('restaurant_name')
+    )
+
+    # print("business_list :: ",business_list)
+
+    # Pagination: 5 items per page
+    paginator = Paginator(business_list, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'home.html', {'page_obj': page_obj})
 
 def otp_send(phone):
     otp = random.randint(1000, 9999)
@@ -57,6 +95,23 @@ def otp_send(phone):
             #     print("Twilio Error:", e)
         return Response({'error': 'Failed to send OTP. '+str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+def report_page(request):
+    return render(request, 'reports.html')
+
+def funnel_page(request):
+    # Fetch unique values from the table
+    star_ratings = Doordash.objects.values_list('star_rating', flat=True).distinct()
+    cuisines = Doordash.objects.values_list('cuisine1', flat=True).distinct()
+    restaurant_types = Doordash.objects.values_list('category', flat=True).distinct()
+
+    context = {
+        'star_ratings': star_ratings,
+        'cuisines': cuisines,
+        'restaurant_types': restaurant_types,
+    }
+
+    return render(request, 'funnel.html', context)
+
 class SignupView(generics.CreateAPIView):
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
@@ -227,3 +282,33 @@ class FilteredRestaurantAPIView(APIView):
             queryset = queryset.filter(cuisine1__iexact=cuisine1)
 
         return Response(queryset)
+    
+# def export_all_businesses(request):
+#     wb = openpyxl.Workbook()
+#     ws = wb.active
+#     ws.title = "Businesses"
+
+#     # Header row
+#     ws.append([
+#         "Name of business", "Rating", "Restaurant Type", 
+#         "No. of items", "Avg. price (1 person)", 
+#         "Avg Online Orders (Monthly)", "Service Type"
+#     ])
+
+#     # All rows
+#     for b in Doordash.objects.all():
+#         ws.append([
+#             b.restaurant_name,
+#             b.star_rating,
+#             b.category,
+#             b.num_items,
+#             float(b.avg_price),
+#             b.reviews_count,
+#             b.service_type
+#         ])
+
+#     # Create HTTP response
+#     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+#     response['Content-Disposition'] = 'attachment; filename=all_businesses.xlsx'
+#     wb.save(response)
+#     return response
