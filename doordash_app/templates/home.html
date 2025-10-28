@@ -315,73 +315,6 @@
         });
         </script>
 
-    <script>
-        // Dummy data
-        // const data = [
-        //   { name: "Sage & Stone Fine Dining", rating: 5.0, type: "Cafe", items: 560, price: "$4", orders: "-", service: "Delivery, Dine In" },
-        //   { name: "The Urban Cow Grill & Tap", rating: 4.0, type: "Restro", items: 680, price: "$4.4", orders: 345, service: "Delivery, Pickup" },
-        //   { name: "Curry House Delight", rating: 4.2, type: "Indian", items: 340, price: "$5", orders: 290, service: "Dine In" },
-        //   { name: "La Pasta Bella", rating: 4.6, type: "Italian", items: 500, price: "$6", orders: 410, service: "Delivery, Dine In" },
-        //   { name: "Taco Town", rating: 3.8, type: "Mexican", items: 300, price: "$3.5", orders: 280, service: "Pickup" },
-        //   { name: "Burger Mania", rating: 4.3, type: "Fast Food", items: 450, price: "$4.2", orders: 350, service: "Delivery" },
-        //   { name: "The Vegan Leaf", rating: 4.9, type: "Vegan", items: 380, price: "$5.5", orders: 410, service: "Delivery, Pickup" },
-        //   { name: "Sushi Paradise", rating: 4.7, type: "Japanese", items: 260, price: "$7", orders: 200, service: "Dine In" },
-        //   { name: "BBQ Central", rating: 4.1, type: "BBQ", items: 520, price: "$6", orders: 370, service: "Delivery, Pickup" },
-        //   { name: "Pizza Palace", rating: 4.5, type: "Italian", items: 410, price: "$5.2", orders: 390, service: "Delivery, Dine In" },
-        //   { name: "Café Aroma", rating: 4.8, type: "Cafe", items: 280, price: "$3", orders: 270, service: "Dine In" },
-        //   { name: "The Green Bowl", rating: 4.4, type: "Healthy", items: 230, price: "$5.8", orders: 320, service: "Delivery" }
-        // ];
-    
-        const rowsPerPage = 5;
-        let currentPage = 1;
-    
-        // function displayTable(page) {
-        //   const start = (page - 1) * rowsPerPage;
-        //   const end = start + rowsPerPage;
-        //   const pageData = data.slice(start, end);
-    
-        //   const tableBody = document.getElementById("table-body");
-        //   tableBody.innerHTML = "";
-    
-        //   pageData.forEach(row => {
-        //     const tr = `
-        //       <tr>
-        //         <td>${row.name}</td>
-        //         <td>${row.rating}</td>
-        //         <td>${row.type}</td>
-        //         <td>${row.items}</td>
-        //         <td>${row.price}</td>
-        //         <td>${row.orders}</td>
-        //         <td>${row.service}</td>
-        //       </tr>
-        //     `;
-        //     // tableBody.innerHTML += tr;
-        //   });
-    
-        //   setupPagination();
-        // }
-    
-        // function setupPagination() {
-        //   const pageCount = Math.ceil(data.length / rowsPerPage);
-        //   const pagination = document.getElementById("pagination");
-        //   pagination.innerHTML = "";
-    
-        //   for (let i = 1; i <= pageCount; i++) {
-        //     const li = document.createElement("li");
-        //     li.className = `page-item ${i === currentPage ? "active" : ""}`;
-        //     li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-        //     li.addEventListener("click", () => {
-        //       currentPage = i;
-        //       displayTable(currentPage);
-        //     });
-        //     pagination.appendChild(li);
-        //   }
-        // }
-    
-        // Initialize
-        // displayTable(currentPage);
-      </script>
-    
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
@@ -432,4 +365,5 @@
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
 
 </body>
+
 </html>
